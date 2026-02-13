@@ -40,8 +40,6 @@ impl AppConfig {
             None => return Err("Cannot compute the configuration file path".into()),
         };
 
-        dbg!(config_file_path);
-
         // check if path exists or create default settings file
         if !Path::new(&config_file_path).exists() {
             Self::create_default(config_file_path)?;

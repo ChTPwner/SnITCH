@@ -62,8 +62,6 @@ impl InputViewer {
 
     fn set_size(ctx: &mut Context, skin: &SkinData) -> Result<(), Box<dyn Error>> {
         ctx.gfx.set_drawable_size(skin.current_skin.background.width, skin.current_skin.background.height)?;
-        dbg!(ctx.gfx.size());
-        dbg!(ctx.gfx.drawable_size());
         Ok(())
     }
 
@@ -193,8 +191,6 @@ impl event::EventHandler for InputViewer {
 
         // draw background
         canvas.draw(&self.skin.current_skin.background.image, DrawParam::new());
-        // dbg!(ctx.gfx.drawable_size());
-        // dbg!(ctx.gfx.size());
 
         // Draw inputs
         self.events.iter().for_each(|event| {

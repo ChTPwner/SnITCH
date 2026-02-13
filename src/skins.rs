@@ -79,8 +79,7 @@ fn buttons_map_to_array_generic<T>(
         if let Some(item) = map.remove(key) {
             vec.push(item);
         } else {
-            return Err(Box::new(io::Error::new(
-                io::ErrorKind::Other,
+            return Err(Box::new(io::Error::other(
                 format!("Missing button: {:?}", key),
             )));
         }
