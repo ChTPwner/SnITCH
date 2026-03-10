@@ -13,7 +13,7 @@ use rusb2snes::{SyncClient, USB2SnesEndpoint};
 use std::error::Error;
 // use winit::keyboard::{Key, NamedKey};
 
-pub const APP_NAME: &str = "Snes Input Display";
+pub const APP_NAME: &str = "SnITCH";
 
 pub struct InputViewer {
     config: AppConfig,

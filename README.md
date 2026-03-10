@@ -1,4 +1,4 @@
-# Snes controller input display
+# SnITCH - Snes Input Tracking Controller HUD
 ![image info](images/snes_controller.png)
 
 Displays your SNES input reading directly from the console data, built in Rust with [ggez](https://ggez.rs).

@@ -1,5 +1,5 @@
 [package]
-name = "snes_input_display"
+name = "SnITCH"
 version = "0.3.4"
 edition = "2021"
 license = " GPL-3.0-or-later"
