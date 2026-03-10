@@ -78,7 +78,8 @@ $ chmod +x snes_input_display_mac_amd64
 - l = select the next available retroskin
 - b = select the next available background for your chosen Retroskin
 
-Changing skin under Wayland is buggy and might not work as expected.
+> [!WARNING]
+> Changing skin under Wayland is buggy and might not work as expected.
 
 ## Game List Working with the Defaults layout
 You should try with the Default Layout if you're on the Sd2Snes/FxPakPro. It will NOT work with an emulator
