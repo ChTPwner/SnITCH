@@ -5,6 +5,7 @@ use std::fs::{read_to_string, write, File};
 use std::path::{Path, PathBuf};
 
 use crate::controller::controller_impl::ControllerConfig;
+use crate::input_viewer::APP_NAME;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct AppConfig {
@@ -30,9 +31,7 @@ impl AppConfig {
 
         let config_file_path = match path {
             Some(p) => PathBuf::from(p),
-            None => config_dir_path
-                .join("snes-input-display")
-                .join("settings.toml"),
+            None => config_dir_path.join(APP_NAME).join("settings.toml"),
         };
 
         let config_file_path = match config_file_path.to_str() {
@@ -57,7 +56,7 @@ impl AppConfig {
             Some(p) => p,
             None => return Err("Could not compute Documents directory".into()),
         };
-        let default_dir = documents_dir.join("snes-input-display");
+        let default_dir = documents_dir.join(APP_NAME);
         let default_inputs_file_path = default_dir.join("inputs_addresses.json");
         let default_skins_dir_path = default_dir.join("skins");
 

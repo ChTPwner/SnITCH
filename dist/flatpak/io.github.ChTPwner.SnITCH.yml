@@ -12,7 +12,7 @@ finish-args:
   - --device=dri
   - --share=network
   - --filesystem=xdg-documents:create
-  - --filesystem=xdg-config/snes-input-display:create
+  - --filesystem=xdg-config/SnITCH:create
 
 build-options:
   append-path: /usr/lib/sdk/rust-stable/bin
