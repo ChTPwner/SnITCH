@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.ChTPwner.SnITCH</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>SnITCH</name>
+  <summary>SNES Input Tracking Controller HUD</summary>
+  <description>
+    <p>
+      SnITCH displays your Super Nintendo controller inputs in real-time by reading console memory directly.
+      Built in Rust with ggez, it supports RetroSpy-compatible controller skins and works with QUsb2snes / SNI.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.ChTPwner.SnITCH.desktop</launchable>
+  <url type="homepage">https://github.com/ChTPwner/SnITCH</url>
+  <url type="bugtracker">https://github.com/ChTPwner/SnITCH/issues</url>
+  <developer_name>ChTPwner</developer_name>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.3.4" date="2026-08-14"/>
+  </releases>
+</component>
