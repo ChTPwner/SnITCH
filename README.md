@@ -73,6 +73,17 @@ port = 23074
 
 [Settings file example can be found here](./confs/settings.toml)
 
+## Arch Linux
+
+Install the [AUR package](https://aur.archlinux.org/packages/snitch-input-display) with an AUR helper, for example:
+
+```sh
+yay -S snitch-input-display
+```
+
+The package is updated automatically after each successful GitHub release.
+Repository maintainers must configure the `AUR_SSH_PRIVATE_KEY` Actions secret with an authorized SSH key.
+
 ### For Linux and MacOS
 
 Dont forget to set the correct permission on the file to allow it to execute

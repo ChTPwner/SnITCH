@@ -1,0 +1,129 @@
+name: Update AUR package
+
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'v')
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Install packaging and publishing tools
+        run: pacman -Syu --noconfirm --needed base-devel curl git openssh python
+
+      - name: Checkout release source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Render release metadata
+        env:
+          RELEASE_TAG: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Unsupported release tag: $RELEASE_TAG" >&2
+            exit 1
+          fi
+
+          version="${RELEASE_TAG#v}"
+          mkdir -p /tmp/snitch-aur-sources
+          curl --fail --location --silent --show-error \
+            "https://github.com/ChTPwner/SnITCH/releases/download/${RELEASE_TAG}/SnITCH-linux-amd64" \
+            --output /tmp/snitch-aur-sources/SnITCH-linux-amd64
+          curl --fail --location --silent --show-error \
+            "https://raw.githubusercontent.com/ChTPwner/SnITCH/${RELEASE_TAG}/dist/aur/SnITCH.desktop" \
+            --output /tmp/snitch-aur-sources/SnITCH.desktop
+          curl --fail --location --silent --show-error \
+            "https://raw.githubusercontent.com/ChTPwner/SnITCH/${RELEASE_TAG}/images/icon.png" \
+            --output /tmp/snitch-aur-sources/SnITCH.png
+
+          python - "$version" <<'PY'
+          import hashlib
+          import re
+          import sys
+          from pathlib import Path
+
+          version = sys.argv[1]
+          source_dir = Path("/tmp/snitch-aur-sources")
+          filenames = ("SnITCH-linux-amd64", "SnITCH.desktop", "SnITCH.png")
+          checksums = [
+              hashlib.sha256((source_dir / filename).read_bytes()).hexdigest()
+              for filename in filenames
+          ]
+
+          pkgbuild = Path("dist/aur/PKGBUILD")
+          text = pkgbuild.read_text()
+          text, pkgname_replacements = re.subn(
+              r"^pkgname=.*$",
+              "pkgname=snitch-input-display",
+              text,
+              count=1,
+              flags=re.MULTILINE,
+          )
+          text, pkgver_replacements = re.subn(
+              r"^pkgver=.*$",
+              f"pkgver={version}",
+              text,
+              count=1,
+              flags=re.MULTILINE,
+          )
+          checksum_lines = "sha256sums=(\n" + "".join(
+              f'  "{checksum}"\n' for checksum in checksums
+          ) + ")"
+          text, replacements = re.subn(
+              r"^sha256sums=\(.*?\)",
+              checksum_lines,
+              text,
+              count=1,
+              flags=re.MULTILINE | re.DOTALL,
+          )
+          if (
+              pkgname_replacements != 1
+              or pkgver_replacements != 1
+              or replacements != 1
+          ):
+              raise SystemExit("Could not render PKGBUILD metadata")
+          pkgbuild.write_text(text)
+          PY
+
+      - name: Generate .SRCINFO
+        run: |
+          set -euo pipefail
+          useradd --create-home builder
+          chown builder:builder dist/aur/PKGBUILD
+          su builder -s /bin/bash -c 'cd "$GITHUB_WORKSPACE/dist/aur" && makepkg --printsrcinfo' > dist/aur/.SRCINFO
+
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+
+      - name: Publish to AUR
+        env:
+          RELEASE_TAG: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          git clone ssh://aur@aur.archlinux.org/snitch-input-display.git /tmp/aur-repo
+          cp dist/aur/PKGBUILD dist/aur/.SRCINFO dist/aur/SnITCH.desktop /tmp/aur-repo/
+          cd /tmp/aur-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PKGBUILD .SRCINFO SnITCH.desktop
+          if git diff --cached --quiet; then
+            echo "AUR package is already up to date."
+            exit 0
+          fi
+          git commit -m "Update snitch-input-display to ${RELEASE_TAG}"
+          git push origin master
