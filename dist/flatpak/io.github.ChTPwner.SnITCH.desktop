@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=SnITCH
+Comment=SNES Input Tracking Controller HUD
+Exec=SnITCH
+Icon=io.github.ChTPwner.SnITCH
+Terminal=false
+Type=Application
+Categories=Game;Utility;
+Keywords=snes;retrospy;input;display;hud;

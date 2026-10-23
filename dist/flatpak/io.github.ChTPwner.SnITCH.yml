@@ -1,0 +1,36 @@
+app-id: io.github.ChTPwner.SnITCH
+runtime: org.freedesktop.Platform
+runtime-version: "26.08"
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: SnITCH
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --device=dri
+  - --share=network
+  - --filesystem=xdg-documents:create
+  - --filesystem=xdg-config/snes-input-display:create
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/SnITCH/cargo
+
+modules:
+  - name: SnITCH
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 SnITCH-linux-amd64 /app/bin/SnITCH
+      - install -Dm644 dist/flatpak/io.github.ChTPwner.SnITCH.desktop /app/share/applications/io.github.ChTPwner.SnITCH.desktop
+      - install -Dm644 dist/flatpak/io.github.ChTPwner.SnITCH.metainfo.xml /app/share/metainfo/io.github.ChTPwner.SnITCH.metainfo.xml
+      - install -Dm644 images/icon.png /app/share/icons/hicolor/128x128/apps/io.github.ChTPwner.SnITCH.png
+    sources:
+      - type: file
+        url: https://github.com/ChTPwner/SnITCH/releases/download/v0.3.4/SnITCH-linux-amd64
+        sha256: <sha256-of-the-release-asset>
+        dest-filename: SnITCH-linux-amd64
+      - type: dir
+        path: ../..

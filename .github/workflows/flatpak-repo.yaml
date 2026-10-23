@@ -1,0 +1,97 @@
+name: Build & Host Flatpak Repository
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  flatpak-builder:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-builder:latest
+      options: --privileged
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Flatpak & Commit to OSTree Repo
+        run: |
+          flatpak-builder --force-clean --repo=repo build-dir dist/flatpak/io.github.ChTPwner.SnITCH.yml
+          flatpak build-update-repo repo
+
+      - name: Create repository metadata and landing page
+        run: |
+          cat <<'EOF' > repo/snitch.flatpakrepo
+          [Flatpak Repo]
+          Title=SnITCH Repository
+          Url=https://ChTPwner.github.io/SnITCH/
+          Homepage=https://github.com/ChTPwner/SnITCH
+          Comment=SNES Input Tracking Controller HUD
+          Description=Official Flatpak repository for SnITCH
+          Icon=https://raw.githubusercontent.com/ChTPwner/SnITCH/main/images/snes_controller.png
+          GPGKey=
+          EOF
+
+          cat <<'EOF' > repo/index.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>SnITCH - Flatpak Repository</title>
+            <style>
+              body { font-family: system-ui, -apple-system, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #222; background-color: #fafafa; }
+              code, pre { background: #eef1f5; padding: 4px 8px; border-radius: 4px; font-family: monospace; }
+              pre { padding: 12px; overflow-x: auto; }
+              .btn { display: inline-block; background: #2563eb; color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 6px; font-weight: 500; }
+              .btn:hover { background: #1d4ed8; }
+            </style>
+          </head>
+          <body>
+            <h1>🎮 SnITCH Flatpak Repository</h1>
+            <p>Welcome to the official Flatpak repository for <strong>SnITCH</strong> (SNES Input Tracking Controller HUD).</p>
+
+            <h2>📥 Quick Installation</h2>
+            <p>Add this repository to Flatpak and install SnITCH:</p>
+            <pre><code>flatpak remote-add --if-not-exists snitch https://ChTPwner.github.io/SnITCH/snitch.flatpakrepo
+          flatpak install snitch io.github.ChTPwner.SnITCH</code></pre>
+
+            <p>Or download the repository file directly:</p>
+            <p><a class="btn" href="snitch.flatpakrepo">Download snitch.flatpakrepo</a></p>
+
+            <h2>🔄 Updates</h2>
+            <p>Once installed, you will receive updates automatically whenever you update your system flatpaks:</p>
+            <pre><code>flatpak update</code></pre>
+
+            <hr style="margin-top: 40px; border: 0; border-top: 1px solid #ddd;">
+            <p><small>Source code: <a href="https://github.com/ChTPwner/SnITCH">github.com/ChTPwner/SnITCH</a></small></p>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: repo/
+
+  deploy:
+    needs: flatpak-builder
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

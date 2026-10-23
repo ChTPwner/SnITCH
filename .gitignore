@@ -10,7 +10,12 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+/dist/*
+!/dist/flatpak/
+!/dist/aur/
+/dist/aur/src/
+/dist/aur/pkg/
+/dist/aur/*.pkg.tar.*
 downloads/
 eggs/
 .eggs/

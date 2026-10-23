@@ -1,0 +1,25 @@
+# Maintainer: ChTBoner
+pkgname=snitch
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Displays your SNES input reading directly from the console data"
+license=("GPL3")
+arch=("x86_64")
+provides=("SnITCH")
+depends=("alsa-lib" "systemd-libs")
+url="https://github.com/ChTPwner/SnITCH"
+source=("SnITCH-linux-amd64::https://github.com/ChTPwner/SnITCH/releases/download/v${pkgver}/SnITCH-linux-amd64"
+  "SnITCH.desktop"
+  "SnITCH.png")
+sha256sums=("57b31fd562b2dd90ac343904fa7ac3d5f6fb26ba5b84ca325b20251edf6f1971"
+  "02f140742dd1df3375250a87386aa62b053193ebc2dc74cf617c47a0b01edd76"
+  "47093ba46720d6e29cbc899bf15bd8f77143ead0bc80541b932b3c8df57d92df")
+
+package() {
+  install -dm 755 "$pkgdir/usr/bin"
+  install -dm 755 "$pkgdir/usr/share/applications"
+  install -dm 755 "$pkgdir/usr/share/pixmaps"
+  install -m 644 "$srcdir/SnITCH.png" "$pkgdir/usr/share/pixmaps/SnITCH.png"
+  install -m 755 "$srcdir/SnITCH-linux-amd64" "$pkgdir/usr/bin/SnITCH"
+  install -m 644 "$srcdir/SnITCH.desktop" "$pkgdir/usr/share/applications/SnITCH.desktop"
+}
