@@ -119,7 +119,7 @@ jobs:
         run: |
           set -euo pipefail
           useradd --create-home builder
-          chown builder:builder dist/aur/PKGBUILD
+          chown -R builder:builder dist/aur
           su builder -s /bin/bash -c 'cd "$GITHUB_WORKSPACE/dist/aur" && makepkg --printsrcinfo' > dist/aur/.SRCINFO
 
       - name: Start SSH agent
