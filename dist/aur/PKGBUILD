@@ -8,9 +8,10 @@ arch=("x86_64")
 provides=("SnITCH")
 depends=("alsa-lib" "systemd-libs")
 url="https://github.com/ChTPwner/SnITCH"
-source=("SnITCH-linux-amd64::https://github.com/ChTPwner/SnITCH/releases/download/v${pkgver}/SnITCH-linux-amd64"
-  "SnITCH.desktop::https://raw.githubusercontent.com/ChTPwner/SnITCH/v${pkgver}/dist/aur/SnITCH.desktop"
-  "SnITCH.png::https://raw.githubusercontent.com/ChTPwner/SnITCH/v${pkgver}/images/icon.png")
+_tag="v${pkgver}"
+source=("SnITCH-linux-amd64::https://github.com/ChTPwner/SnITCH/releases/download/${_tag}/SnITCH-linux-amd64"
+  "SnITCH.desktop::https://raw.githubusercontent.com/ChTPwner/SnITCH/${_tag}/dist/aur/SnITCH.desktop"
+  "SnITCH.png::https://raw.githubusercontent.com/ChTPwner/SnITCH/${_tag}/images/icon.png")
 sha256sums=("57b31fd562b2dd90ac343904fa7ac3d5f6fb26ba5b84ca325b20251edf6f1971"
   "65aaac91dcab166fab0fc56d85083cbe0af83ecef4ef5d126562cd4c633a6869"
   "47093ba46720d6e29cbc899bf15bd8f77143ead0bc80541b932b3c8df57d92df")

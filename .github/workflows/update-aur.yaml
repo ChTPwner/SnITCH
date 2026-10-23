@@ -29,12 +29,13 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z][A-Za-z0-9]*)?$ ]]; then
             echo "Unsupported release tag: $RELEASE_TAG" >&2
             exit 1
           fi
 
           version="${RELEASE_TAG#v}"
+          pkgver="${version/-/}"
           mkdir -p /tmp/snitch-aur-sources
           binary_url="https://github.com/ChTPwner/SnITCH/releases/download/${RELEASE_TAG}/SnITCH-linux-amd64"
           for attempt in $(seq 1 60); do
@@ -57,13 +58,13 @@ jobs:
             "https://raw.githubusercontent.com/ChTPwner/SnITCH/${RELEASE_TAG}/images/icon.png" \
             --output /tmp/snitch-aur-sources/SnITCH.png
 
-          python - "$version" <<'PY'
+          python - "$pkgver" "$RELEASE_TAG" <<'PY'
           import hashlib
           import re
           import sys
           from pathlib import Path
 
-          version = sys.argv[1]
+          version, release_tag = sys.argv[1:]
           source_dir = Path("/tmp/snitch-aur-sources")
           filenames = ("SnITCH-linux-amd64", "SnITCH.desktop", "SnITCH.png")
           checksums = [
@@ -87,6 +88,13 @@ jobs:
               count=1,
               flags=re.MULTILINE,
           )
+          text, tag_replacements = re.subn(
+              r"^_tag=.*$",
+              f'_tag="{release_tag}"',
+              text,
+              count=1,
+              flags=re.MULTILINE,
+          )
           checksum_lines = "sha256sums=(\n" + "".join(
               f'  "{checksum}"\n' for checksum in checksums
           ) + ")"
@@ -100,6 +108,7 @@ jobs:
           if (
               pkgname_replacements != 1
               or pkgver_replacements != 1
+              or tag_replacements != 1
               or replacements != 1
           ):
               raise SystemExit("Could not render PKGBUILD metadata")

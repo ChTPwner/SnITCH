@@ -83,6 +83,7 @@ yay -S snitch-input-display
 
 The package update workflow starts when a version tag is created.
 It waits for the `SnITCH-linux-amd64` release asset before publishing.
+Prerelease tags such as `v1.0.1-rc2` are published with an Arch-compatible package version (`1.0.1rc2`).
 Repository maintainers must configure the `AUR_SSH_PRIVATE_KEY` Actions secret with an authorized SSH key.
 
 ### For Linux and MacOS
