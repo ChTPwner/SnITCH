@@ -12,6 +12,10 @@ build/
 develop-eggs/
 /dist/*
 !/dist/flatpak/
+!/dist/aur/
+/dist/aur/src/
+/dist/aur/pkg/
+/dist/aur/*.pkg.tar.*
 downloads/
 eggs/
 .eggs/
