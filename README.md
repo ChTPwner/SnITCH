@@ -81,7 +81,8 @@ Install the [AUR package](https://aur.archlinux.org/packages/snitch-input-displa
 yay -S snitch-input-display
 ```
 
-The package is updated automatically after each successful GitHub release.
+The package update workflow starts when a version tag is created.
+It waits for the `SnITCH-linux-amd64` release asset before publishing.
 Repository maintainers must configure the `AUR_SSH_PRIVATE_KEY` Actions secret with an authorized SSH key.
 
 ### For Linux and MacOS
